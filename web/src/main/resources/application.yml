@@ -1,0 +1,110 @@
+server:
+  port: 8999
+
+spring:
+  flyway:
+    baseline-on-migrate: true
+    enabled: false
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+      date: yyyy-MM-dd
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+      key-prefix: CACHE_
+      time-to-live: 3600000
+  datasource:
+    druid:
+      # 连接池的配置信息
+      # 初始化大小，最小，最大
+      initial-size: 5
+      min-idle: 5
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+#      filters: stat,wall,slf4j
+      filters: stat,slf4j
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      web-stat-filter:
+        enabled: true
+        url-pattern: "/*"
+        exclusions: "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"
+      stat-view-servlet:
+        enabled: true
+        url-pattern: "/druid/*"
+        reset-enable: false
+        login-username: admin
+        login-password: 123456
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: Authorization
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: false
+  is-read-body: false
+  is-read-cookie: true
+  is-read-head: true
+  is-print: false
+
+#MyBatis-plus
+mybatis-plus:
+  global-config:
+    banner: false
+  configuration:
+    #不加这个查询数据为空时，字段将被隐藏
+    call-setters-on-nulls: true
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    jdbc-type-for-null: null
+fdfs:
+  soTimeout: 1500
+  connectTimeout: 600
+
+flowable:
+  async-executor-activate: false
+  history-level: full
+  activity-font-name: "宋体"
+  label-font-name: "宋体"
+  annotation-font-name: "宋体"
+  database-schema-update: true
+
+
+knife4j:
+  # 开启增强配置
+  enable: true
+  # 开启生产环境屏蔽
+#  production: true
+#  basic:
+#    enable: true
+#    username: admin
+#    password: 123456
+
+
+
+ignored: |
+  /v2/*,/favicon.ico,/swagger-resources/**,/druid/**,/swagger-ui.html,/webjars/**,
+  /doc.html,
+  /error,
+  /login,
+  /system/file/**,
+  /system/user/exportExcel,
+  /system/kaptcha/render,
+  /system/user2/**,
+  /flow/diagram/**

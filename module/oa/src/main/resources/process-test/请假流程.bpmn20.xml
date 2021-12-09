@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:flowable="http://flowable.org/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.flowable.org/processdef">
+  <process id="leave" name="请假流程" flowable:processCategory="审批">
+    <documentation>请假流程演示</documentation>
+    <startEvent id="startNode1" name="开始">
+      <outgoing>Flow_01bvk7j</outgoing>
+    </startEvent>
+    <exclusiveGateway id="Gateway_0l3qptq">
+      <incoming>Flow_06ivnvv</incoming>
+      <outgoing>Flow_0o8panc</outgoing>
+      <outgoing>Flow_1paxnab</outgoing>
+    </exclusiveGateway>
+    <endEvent id="Event_1a7hx78" name="结束">
+      <incoming>Flow_0vlxg71</incoming>
+    </endEvent>
+    <userTask id="Activity_1q7mri7" name="校长审批">
+      <extensionElements>
+        <flowable:taskListener class="com.dcy.workflow.listener.TaskCandidateListener" event="create" />
+        <flowable:taskListener class="com.dcy.workflow.listener.RejectTaskListener" event="complete" />
+        <flowable:taskListener class="com.dcy.workflow.listener.CompleteTaskListener" event="complete" />
+      </extensionElements>
+      <incoming>Flow_1paxnab</incoming>
+      <outgoing>Flow_0z2hdjs</outgoing>
+    </userTask>
+    <userTask id="Activity_0hgofl1" name="班长审批">
+      <extensionElements>
+        <flowable:taskListener class="com.dcy.workflow.listener.TaskCandidateListener" event="create" />
+        <flowable:taskListener class="com.dcy.workflow.listener.RejectTaskListener" event="complete" />
+      </extensionElements>
+      <incoming>Flow_0qqiq0u</incoming>
+      <outgoing>Flow_0i15an6</outgoing>
+    </userTask>
+    <userTask id="Activity_0e5ryeg" name="老师审批">
+      <extensionElements>
+        <flowable:taskListener class="com.dcy.workflow.listener.TaskCandidateListener" event="create" />
+        <flowable:taskListener class="com.dcy.workflow.listener.RejectTaskListener" event="complete" />
+      </extensionElements>
+      <incoming>Flow_0mwxgap</incoming>
+      <outgoing>Flow_06ivnvv</outgoing>
+    </userTask>
+    <sequenceFlow id="Flow_06ivnvv" name="" sourceRef="Activity_0e5ryeg" targetRef="Gateway_0l3qptq" />
+    <sequenceFlow id="Flow_01bvk7j" sourceRef="startNode1" targetRef="Activity_1lrd62w" />
+    <userTask id="Activity_1lrd62w" name="用户申请" flowable:assignee="${userId}">
+      <extensionElements />
+      <incoming>Flow_01bvk7j</incoming>
+      <incoming>Flow_1jk4cjn</incoming>
+      <incoming>Flow_0o8panc</incoming>
+      <incoming>Flow_1fi83kt</incoming>
+      <outgoing>Flow_0qqiq0u</outgoing>
+    </userTask>
+    <sequenceFlow id="Flow_0qqiq0u" sourceRef="Activity_1lrd62w" targetRef="Activity_0hgofl1" />
+    <exclusiveGateway id="Gateway_02dkpvv">
+      <incoming>Flow_0i15an6</incoming>
+      <outgoing>Flow_0mwxgap</outgoing>
+      <outgoing>Flow_1jk4cjn</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_0i15an6" sourceRef="Activity_0hgofl1" targetRef="Gateway_02dkpvv" />
+    <sequenceFlow id="Flow_0mwxgap" name="同意" sourceRef="Gateway_02dkpvv" targetRef="Activity_0e5ryeg">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'success'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_1jk4cjn" name="驳回" sourceRef="Gateway_02dkpvv" targetRef="Activity_1lrd62w">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'reject'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_0o8panc" name="驳回" sourceRef="Gateway_0l3qptq" targetRef="Activity_1lrd62w">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'reject'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_1paxnab" name="同意" sourceRef="Gateway_0l3qptq" targetRef="Activity_1q7mri7">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'success'}</conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="Gateway_0upmhuh">
+      <incoming>Flow_0z2hdjs</incoming>
+      <outgoing>Flow_0vlxg71</outgoing>
+      <outgoing>Flow_1fi83kt</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_0z2hdjs" sourceRef="Activity_1q7mri7" targetRef="Gateway_0upmhuh" />
+    <sequenceFlow id="Flow_0vlxg71" name="同意" sourceRef="Gateway_0upmhuh" targetRef="Event_1a7hx78">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'success'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_1fi83kt" name="驳回" sourceRef="Gateway_0upmhuh" targetRef="Activity_1lrd62w">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'reject'}</conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_flow">
+    <bpmndi:BPMNPlane id="BPMNPlane_flow" bpmnElement="leave">
+      <bpmndi:BPMNEdge id="Flow_1fi83kt_di" bpmnElement="Flow_1fi83kt">
+        <di:waypoint x="610" y="-75" />
+        <di:waypoint x="610" y="-230" />
+        <di:waypoint x="-230" y="-230" />
+        <di:waypoint x="-230" y="-90" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="619" y="-127" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vlxg71_di" bpmnElement="Flow_0vlxg71">
+        <di:waypoint x="635" y="-50" />
+        <di:waypoint x="692" y="-50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="652" y="-68" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0z2hdjs_di" bpmnElement="Flow_0z2hdjs">
+        <di:waypoint x="530" y="-50" />
+        <di:waypoint x="585" y="-50" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1paxnab_di" bpmnElement="Flow_1paxnab">
+        <di:waypoint x="365" y="-50" />
+        <di:waypoint x="430" y="-50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="386" y="-68" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0o8panc_di" bpmnElement="Flow_0o8panc">
+        <di:waypoint x="340" y="-75" />
+        <di:waypoint x="340" y="-190" />
+        <di:waypoint x="-200" y="-190" />
+        <di:waypoint x="-200" y="-90" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="349" y="-117" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jk4cjn_di" bpmnElement="Flow_1jk4cjn">
+        <di:waypoint x="70" y="-25" />
+        <di:waypoint x="70" y="90" />
+        <di:waypoint x="-230" y="90" />
+        <di:waypoint x="-230" y="-10" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="79" y="3" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mwxgap_di" bpmnElement="Flow_0mwxgap">
+        <di:waypoint x="95" y="-50" />
+        <di:waypoint x="150" y="-50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="111" y="-68" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0i15an6_di" bpmnElement="Flow_0i15an6">
+        <di:waypoint x="0" y="-50" />
+        <di:waypoint x="45" y="-50" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qqiq0u_di" bpmnElement="Flow_0qqiq0u">
+        <di:waypoint x="-180" y="-50" />
+        <di:waypoint x="-100" y="-50" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01bvk7j_di" bpmnElement="Flow_01bvk7j">
+        <di:waypoint x="-325" y="-50" />
+        <di:waypoint x="-280" y="-50" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06ivnvv_di" bpmnElement="Flow_06ivnvv">
+        <di:waypoint x="250" y="-50" />
+        <di:waypoint x="315" y="-50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="263" y="-68" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_startNode1" bpmnElement="startNode1" bioc:stroke="">
+        <omgdc:Bounds x="-355" y="-65" width="30" height="30" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="-352" y="-28" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1vj8717_di" bpmnElement="Gateway_0l3qptq" isMarkerVisible="true">
+        <omgdc:Bounds x="315" y="-75" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1a7hx78_di" bpmnElement="Event_1a7hx78">
+        <omgdc:Bounds x="692" y="-68" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="699" y="-28" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1m2mzme_di" bpmnElement="Activity_1q7mri7">
+        <omgdc:Bounds x="430" y="-90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jkhbkc_di" bpmnElement="Activity_0hgofl1">
+        <omgdc:Bounds x="-100" y="-90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ng1arz_di" bpmnElement="Activity_0e5ryeg">
+        <omgdc:Bounds x="150" y="-90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0sj0dm2_di" bpmnElement="Activity_1lrd62w">
+        <omgdc:Bounds x="-280" y="-90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_02dkpvv_di" bpmnElement="Gateway_02dkpvv" isMarkerVisible="true">
+        <omgdc:Bounds x="45" y="-75" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0upmhuh_di" bpmnElement="Gateway_0upmhuh" isMarkerVisible="true">
+        <omgdc:Bounds x="585" y="-75" width="50" height="50" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

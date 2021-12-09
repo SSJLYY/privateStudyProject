@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dcy.system.mapper.DeptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dcy.system.model.Dept">
+        <id column="id" property="id" />
+        <result column="parent_id" property="parentId" />
+        <result column="ancestors" property="ancestors" />
+        <result column="name" property="name" />
+        <result column="dept_sort" property="deptSort" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="dept_status" property="deptStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, parent_id, ancestors, name, dept_sort, phone, email, dept_status
+    </sql>
+    <select id="selectChildrenById" resultType="java.lang.String">
+        select id from sys_dept where FIND_IN_SET(#{id},ancestors)
+    </select>
+
+</mapper>

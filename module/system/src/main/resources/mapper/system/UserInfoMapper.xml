@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dcy.system.mapper.UserInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dcy.system.model.UserInfo">
+        <id column="id" property="id"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="user_type" property="userType"/>
+        <result column="email" property="email"/>
+        <result column="phone_number" property="phoneNumber"/>
+        <result column="sex" property="sex"/>
+        <result column="avatar_path" property="avatarPath"/>
+        <result column="user_status" property="userStatus"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_date" property="createDate"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_date" property="updateDate"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, dept_id, username, password, nick_name, user_type, email, phone_number, sex, avatar_path, user_status
+    </sql>
+
+    <!-- 通用查询结果列 别名 -->
+    <sql id="Base_Column_List_Alias">
+        userInfo.id,userInfo.dept_id AS deptId,userInfo.username,userInfo.password,userInfo.nick_name AS nickName,userInfo.user_type AS userType,userInfo.email,userInfo.phone_number AS phoneNumber,userInfo.sex,userInfo.avatar_path AS avatarPath,userInfo.user_status AS userStatus
+    </sql>
+
+    <sql id="Base_Column_List_Role_Alias">
+        role.id AS id,role.role_name AS roleName,role.role_key AS roleKey,role.role_status AS roleStatus,role.data_scope as dataScope
+    </sql>
+
+    <!-- 通用查询结果列 别名 -->
+    <sql id="Base_Column_List_Resources_Alias">
+        resource.id,resource.parent_id AS parentId,resource.parent_ids AS parentIds,resource.title,resource.type,resource.permission,resource.route_path AS routePath,
+        resource.component_name AS componentName,resource.component_path AS componentPath,resource.res_status AS resStatus,resource.res_sort AS resSort,
+        resource.menu_ext_flag AS menuExtFlag,resource.menu_cache_flag AS menuCacheFlag,resource.menu_hidden_flag AS menuHiddenFlag,resource.menu_icon AS menuIcon
+    </sql>
+
+    <select id="selectAuthRoleListByUserId" resultType="com.dcy.system.model.Role">
+        SELECT distinct
+        <include refid="Base_Column_List_Role_Alias"/>
+        FROM sys_user_info user
+        INNER JOIN sys_user_role ur on user.id = ur.user_id
+        INNER JOIN sys_role role on ur.role_id = role.id
+        WHERE user.del_flag = '0' and user.id = #{userId}
+    </select>
+
+    <select id="selectResourcesCodeByUserId" resultType="java.lang.String">
+        SELECT distinct res.permission FROM sys_user_info ui
+            INNER JOIN sys_user_role ur on ui.id=ur.user_id
+            INNER JOIN sys_role role on ur.role_id=role.id
+            INNER JOIN sys_role_res rr on rr.role_id = role.id
+            INNER JOIN sys_resource res on rr.res_id = res.id
+        WHERE ui.del_flag = '0' and ui.id = #{userId} AND role.role_status = '0' AND res.permission is not null
+    </select>
+
+    <select id="selectAuthResourcesListByUserId" resultType="com.dcy.system.model.Resource">
+        SELECT distinct <include refid="Base_Column_List_Resources_Alias"/> FROM sys_user_info ui
+              INNER JOIN sys_user_role ur on ui.id=ur.user_id
+              INNER JOIN sys_role role on ur.role_id=role.id
+              INNER JOIN sys_role_res rr on rr.role_id = role.id
+              INNER JOIN sys_resource resource on rr.res_id = resource.id
+        WHERE ui.del_flag = '0' and ui.id = #{userId} AND role.role_status = '0' and (resource.type = '1' or resource.type = '2') and resource.res_status = '0' order by resource.res_sort
+    </select>
+
+    <select id="selectAuthRoleKeyByUserId" resultType="java.lang.String">
+        SELECT distinct role.role_key AS roleKey
+        FROM sys_user_info user
+        INNER JOIN sys_user_role ur on user.id = ur.user_id
+        INNER JOIN sys_role role on ur.role_id = role.id
+        WHERE user.del_flag = '0' and user.id = #{userId}
+    </select>
+    <select id="selectPageList" resultType="com.dcy.system.model.UserInfo">
+        select <include refid="Base_Column_List_Alias"/>,
+                dept.name as dept_name
+        from sys_user_info userInfo left join sys_dept dept on userInfo.dept_id = dept.id
+        ${ew.customSqlSegment}
+    </select>
+
+
+</mapper>
