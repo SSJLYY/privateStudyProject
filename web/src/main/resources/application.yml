@@ -4,7 +4,7 @@ server:
 spring:
   flyway:
     baseline-on-migrate: true
-    enabled: false
+    enabled: true
   profiles:
     active: dev
   main:
